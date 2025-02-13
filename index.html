@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aravind Gitamuralee | Academic Portfolio</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #ffffff;
+            color: #000000;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-size: 14px;
+        }
+        .content-wrapper {
+            display: flex;
+            flex: 1;
+        }
+        .sidebar {
+            width: 250px;
+            background: #f8f9fa;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar img {
+            width: 140px;
+            height: 180px;
+            object-fit: cover;
+            margin-bottom: 10px;
+            border: 3px solid #ddd;
+            border-radius: 10px;
+        }
+        .sidebar p {
+            text-align: center;
+            font-size: 14px;
+            margin-bottom: 15px;
+            color: #555;
+        }
+        .social-icons {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            align-items: flex-start;
+        }
+        .social-icons a {
+            color: #333;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            padding: 8px 15px;
+            text-decoration: none;
+            width: 100%;
+        }
+        .social-icons a i {
+            width: 30px;
+            text-align: center;
+        }
+        .social-icons a span {
+            flex-grow: 1;
+            text-align: left;
+        }
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+        .nav-bar {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            margin-bottom: 30px;
+            background: #eaeaea;
+            padding: 10px 0;
+        }
+        .nav-bar a {
+            text-decoration: none;
+            font-size: 16px;
+            color: #666;
+            font-weight: bold;
+            padding: 8px 15px;
+            transition: 0.3s;
+        }
+        .nav-bar a:hover, .nav-bar a.active {
+            color: #222;
+        }
+        .content {
+            display: none;
+            padding: 20px;
+        }
+        .content.active {
+            display: block;
+        }
+        footer {
+            background-color: #f1f1f1;
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            margin-top: 20px;
+        }
+    </style>
+    <script>
+        function showPage(pageId) {
+            document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
+            document.querySelectorAll('.nav-bar a').forEach(link => link.classList.remove('active'));
+            var target = document.getElementById(pageId);
+            if (target) {
+                target.classList.add('active');
+                document.querySelector(`.nav-bar a[onclick="showPage('${pageId}')"]`).classList.add('active');
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="content-wrapper">
+        <div class="sidebar">
+            <img src="dummy-profile.jpg" alt="Aravind Gitamuralee">
+            <p>First-year PhD student at Purdue University, USA.</p>
+            <div class="social-icons">
+                <a href="https://yourcv.com" target="_blank"><i class="fas fa-file"></i> <span>CV</span></a>
+                <a href="https://github.com" target="_blank"><i class="fab fa-github"></i> <span>GitHub</span></a>
+                <a href="https://linkedin.com" target="_blank"><i class="fab fa-linkedin"></i> <span>LinkedIn</span></a>
+                <a href="https://scholar.google.com" target="_blank"><i class="fas fa-graduation-cap"></i> <span>Google Scholar</span></a>
+                <a href="mailto:your-email@example.com"><i class="fas fa-envelope"></i> <span>Email</span></a>
+                <a href="https://twitter.com" target="_blank"><i class="fab fa-twitter"></i> <span>Twitter</span></a>
+                <a href="https://instagram.com" target="_blank"><i class="fab fa-instagram"></i> <span>Instagram</span></a>
+                <a href="https://facebook.com" target="_blank"><i class="fab fa-facebook"></i> <span>Facebook</span></a>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="nav-bar">
+                <a href="#" onclick="showPage('about')">About Me</a>
+                <a href="#" onclick="showPage('education')">Education</a>
+                <a href="#" onclick="showPage('publications')">Publications</a>
+                <a href="#" onclick="showPage('experience')">Experience</a>
+            </div>
+            <div id="about" class="content active">
+                <h1>About Me</h1>
+                <p>Welcome to my academic portfolio. Here, you can find details about my research, education, and professional experience.</p>
+            </div>
+            <div id="education" class="content">
+                <h1>Education</h1>
+                <p><strong>Ph.D. in Electrical and Computer Engineering</strong> - Purdue University (Expected 2025)</p>
+                <p><strong>B.Tech in Electrical Engineering</strong> - IIT Kanpur (2020)</p>
+            </div>
+            <div id="publications" class="content">
+                <h1>Publications</h1>
+                <p>"Deep Learning for THz Sensing" - IEEE Conference, 2023</p>
+                <p>"Novel Approaches in Edge Computing" - ACM Transactions, 2022</p>
+            </div>
+            <div id="experience" class="content">
+                <h1>Experience</h1>
+                <p><strong>Research Assistant</strong> - Purdue University (2022 - Present)</p>
+                <p>Working on advanced network architectures for low-power edge devices.</p>
+                <p><strong>Intern</strong> - XYZ Research Labs (2021)</p>
+                <p>Developed real-time data processing algorithms for IoT devices.</p>
+            </div>
+        </div>
+    </div>
+    <footer>
+        &copy; 2025 Aravind Gitamuralee | All Rights Reserved
+    </footer>
+</body>
+</html>
