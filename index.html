@@ -7,118 +7,7 @@
     <link rel="icon" type="image/x-icon" href="./Resources/favicon.ico">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Roboto', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #ffffff;
-            color: #000000;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            font-size: 14px;
-        }
-        .content-wrapper {
-            display: flex;
-            flex: 1;
-        }
-        .sidebar {
-            width: 250px;
-            background: #f8f9fa;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .sidebar img {
-            width: 140px;
-            height: 180px;
-            object-fit: cover;
-            margin-bottom: 10px;
-            border: 3px solid #ddd;
-            border-radius: 10px;
-        }
-        .sidebar p {
-            text-align: center;
-            font-size: 14px;
-            margin-bottom: 15px;
-            color: #555;
-        }
-        .social-icons {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            align-items: flex-start;
-        }
-        .social-icons a {
-            color: #333;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            padding: 8px 15px;
-            text-decoration: none;
-            width: 100%;
-        }
-        .social-icons a i {
-            width: 30px;
-            text-align: center;
-        }
-        .social-icons a span {
-            flex-grow: 1;
-            text-align: left;
-        }
-        .main-content {
-            flex: 1;
-            padding: 40px;
-            overflow-y: auto;
-        }
-        .nav-bar {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin-bottom: 30px;
-            background: #eaeaea;
-            padding: 10px 0;
-        }
-        .nav-bar a {
-            text-decoration: none;
-            font-size: 16px;
-            color: #666;
-            font-weight: bold;
-            padding: 8px 15px;
-            transition: 0.3s;
-        }
-        .nav-bar a:hover, .nav-bar a.active {
-            color: #222;
-        }
-        .content {
-            display: none;
-            padding: 20px;
-        }
-        .content.active {
-            display: block;
-        }
-        footer {
-            background-color: #f1f1f1;
-            text-align: center;
-            padding: 10px;
-            font-size: 14px;
-            margin-top: 20px;
-        }
-    </style>
-    <script>
-        function showPage(pageId) {
-            document.querySelectorAll('.content').forEach(content => content.classList.remove('active'));
-            document.querySelectorAll('.nav-bar a').forEach(link => link.classList.remove('active'));
-            var target = document.getElementById(pageId);
-            if (target) {
-                target.classList.add('active');
-                document.querySelector(`.nav-bar a[onclick="showPage('${pageId}')"]`).classList.add('active');
-            }
-        }
-    </script>
+    <link rel="stylesheet" href="mystyle.css">
 </head>
 <body>
     <div class="content-wrapper">
@@ -139,10 +28,10 @@
         
         <div class="main-content">
             <div class="nav-bar">
-                <a href="#" onclick="showPage('about')">About Me</a>
-                <a href="#" onclick="showPage('education')">Education</a>
-                <a href="#" onclick="showPage('publications')">Publications</a>
-                <a href="#" onclick="showPage('experience')">Experience</a>
+                <a href="about" onclick="showPage('about')">About Me</a>
+                <a href="education" onclick="showPage('education')">Education</a>
+                <a href="publications" onclick="showPage('publications')">Publications</a>
+                <a href="experience" onclick="showPage('experience')">Experience</a>
             </div>
             <div id="about" class="content active">
                 <h1>About Me</h1>
@@ -173,5 +62,6 @@
     <footer>
         &copy; 2025 Aravind Gitamuralee | All Rights Reserved
     </footer>
+<script src="myscripts.js"></script>
 </body>
 </html>
