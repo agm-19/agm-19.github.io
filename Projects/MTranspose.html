@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transpose Notes</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        .container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        table {
+            margin: 20px;
+            border-collapse: collapse;
+        }
+        td {
+            border: 1px solid black;
+            padding: 10px;
+            width: 50px;
+            text-align: center;
+        }
+        input[type=range] {
+            width: 300px;
+            margin-top: 20px;
+        }
+        .transpose-indicator {
+            font-weight: bold;
+            padding: 5px;
+            display: inline-block;
+            min-width: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Transpose Musical Notes</h2>
+    <div class="container">
+        <span id="leftIndicator" class="transpose-indicator"></span>
+        <table>
+            <tr id="originalRow"></tr>
+            <tr id="transposedRow"></tr>
+            <tr id="flatEquivalentRow"></tr>
+        </table>
+        <span id="rightIndicator" class="transpose-indicator"></span>
+    </div>
+    <label for="transposeSlider">Transpose: <span id="transposeValue">0</span></label>
+    <input type="range" id="transposeSlider" min="-12" max="12" value="0">
+
+    <script>
+        const notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        const flatEquivalents = {
+            "C#": "Db", "D#": "Eb", "F#": "Gb", "G#": "Ab", "A#": "Bb", 
+            "E": "Fb", "F": "E#", "B": "Cb", "Cb": "B", "B#": "C", "C": "B#"
+        };
+        
+        const originalRow = document.getElementById("originalRow");
+        const transposedRow = document.getElementById("transposedRow");
+        const flatEquivalentRow = document.getElementById("flatEquivalentRow");
+        const transposeSlider = document.getElementById("transposeSlider");
+        const transposeValue = document.getElementById("transposeValue");
+        const leftIndicator = document.getElementById("leftIndicator");
+        const rightIndicator = document.getElementById("rightIndicator");
+
+        function populateTable() {
+            originalRow.innerHTML = "";
+            transposedRow.innerHTML = "";
+            flatEquivalentRow.innerHTML = "";
+            
+            notes.forEach(note => {
+                let cell = document.createElement("td");
+                cell.textContent = note;
+                originalRow.appendChild(cell);
+            });
+            updateTransposedRow(0);
+        }
+
+        function updateTransposedRow(shift) {
+            transposedRow.innerHTML = "";
+            flatEquivalentRow.innerHTML = "";
+            transposeValue.textContent = shift > 0 ? `+${shift}` : shift;
+            
+            notes.forEach((note, index) => {
+                let transposedIndex = (index + shift + notes.length) % notes.length;
+                let transposedNote = notes[transposedIndex];
+                let cell = document.createElement("td");
+                cell.textContent = transposedNote;
+                transposedRow.appendChild(cell);
+                
+                let flatCell = document.createElement("td");
+                flatCell.textContent = flatEquivalents[transposedNote] || "";
+                flatEquivalentRow.appendChild(flatCell);
+            });
+
+            // Update indicators
+            const displayShift = shift > 0 ? `+${shift}` : shift;
+            leftIndicator.textContent = displayShift;
+            rightIndicator.textContent = displayShift;
+            let color = shift > 0 ? "green" : shift < 0 ? "red" : "black";
+            leftIndicator.style.color = color;
+            rightIndicator.style.color = color;
+        }
+
+        transposeSlider.addEventListener("input", (event) => {
+            updateTransposedRow(parseInt(event.target.value));
+        });
+
+        populateTable();
+    </script>
+</body>
+</html>
