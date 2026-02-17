@@ -1,3 +1,0 @@
-RewriteEngine On 
-RewriteCond %{HTTP_HOST} ^www.agm19.com 
-RewriteRule (.*) https://agm19.com/$1 [R=301,L]
