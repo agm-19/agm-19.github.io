@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aravind Gitamuralee — Deep Space Terminal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,300&family=Oxanium:wght@300;600;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ── reset & root ── */
+    *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+    :root {
+      --g: #00ff41;       /* phosphor green */
+      --g2: #00cc33;
+      --g3: rgba(0,255,65,.12);
+      --b: #00d4ff;       /* cold blue accent */
+      --o: #ff9500;       /* orange accent */
+      --r: #ff3355;       /* alert red */
+      --bg: #050c0a;
+      --bg2: #0a1610;
+      --text: rgba(0,255,65,.88);
+      --dim: rgba(0,255,65,.4);
+      --glow: 0 0 8px rgba(0,255,65,.7), 0 0 20px rgba(0,255,65,.3);
+      --glow-b: 0 0 8px rgba(0,212,255,.7), 0 0 20px rgba(0,212,255,.3);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── custom cursor ── */
+    #cursor {
+      position: fixed;
+      width: 14px; height: 14px;
+      border: 1px solid var(--g);
+      box-shadow: var(--glow);
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform .12s, opacity .2s;
+      transform: translate(-50%, -50%);
+    }
+    #cursor.clicking { transform: translate(-50%,-50%) scale(.6); }
+    #cursor-trail {
+      position: fixed;
+      width: 4px; height: 4px;
+      background: var(--g);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      opacity: .5;
+      transform: translate(-50%,-50%);
+      transition: left .08s, top .08s;
+    }
+
+    /* ── canvas starfield ── */
+    #starCanvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── CRT overlay layers ── */
+    .crt-scanlines {
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(0,0,0,.18) 3px,
+        rgba(0,0,0,.18) 4px
+      );
+      pointer-events: none;
+      z-index: 900;
+    }
+    .crt-vignette {
+      position: fixed; inset: 0;
+      background: radial-gradient(ellipse 80% 80% at 50% 50%,
+        transparent 50%, rgba(0,0,0,.7) 100%);
+      pointer-events: none;
+      z-index: 901;
+    }
+    /* slow moving horizontal light bleed */
+    .crt-bleed {
+      position: fixed; left:0; top:0;
+      width:100%; height:3px;
+      background: linear-gradient(90deg, transparent, rgba(0,255,65,.15), transparent);
+      pointer-events: none;
+      z-index: 902;
+      animation: bleedScan 8s linear infinite;
+    }
+    @keyframes bleedScan {
+      0%   { top: -3px; opacity:.8; }
+      100% { top: 100vh; opacity:.3; }
+    }
+
+    /* ── page layout ── */
+    .page { position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; padding: 0 28px 100px; }
+
+    /* ── hero ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 60px 0 40px;
+      position: relative;
+    }
+
+    .hero-topbar {
+      position: absolute;
+      top: 28px; left: 0; right: 0;
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: var(--dim);
+      letter-spacing: .05em;
+    }
+    .hero-topbar .blink { animation: blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity:0; } }
+
+    .hero-label {
+      font-size: 12px;
+      color: var(--b);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+      opacity: 0;
+      animation: fadeUp .6s .3s forwards;
+    }
+
+    .hero-name {
+      font-family: 'Oxanium', monospace;
+      font-weight: 800;
+      font-size: clamp(36px, 7vw, 76px);
+      line-height: 1.05;
+      letter-spacing: -.01em;
+      color: var(--g);
+      text-shadow: var(--glow);
+      opacity: 0;
+      animation: fadeUp .7s .5s forwards;
+      position: relative;
+    }
+    /* chromatic aberration on name */
+    .hero-name::before {
+      content: attr(data-text);
+      position: absolute;
+      left: 2px; top: 1px;
+      color: var(--r);
+      opacity: .25;
+      clip-path: polygon(0 0, 100% 0, 100% 45%, 0 45%);
+    }
+    .hero-name::after {
+      content: attr(data-text);
+      position: absolute;
+      left: -2px; top: -1px;
+      color: var(--b);
+      opacity: .2;
+      clip-path: polygon(0 55%, 100% 55%, 100% 100%, 0 100%);
+    }
+
+    .hero-role {
+      margin-top: 16px;
+      font-size: 15px;
+      color: var(--dim);
+      opacity: 0;
+      animation: fadeUp .6s .7s forwards;
+    }
+    .hero-role .tag {
+      display: inline-block;
+      background: var(--g3);
+      border: 1px solid rgba(0,255,65,.25);
+      color: var(--g);
+      font-size: 12px;
+      padding: 3px 10px;
+      margin: 4px 4px 0 0;
+    }
+
+    /* glitch flash */
+    @keyframes glitch {
+      0%,100% { clip-path: none; transform: none; }
+      20%  { clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%); transform: translateX(-4px); }
+      21%  { clip-path: none; transform: none; }
+      60%  { clip-path: polygon(0 65%, 100% 65%, 100% 75%, 0 75%); transform: translateX(3px); }
+      61%  { clip-path: none; transform: none; }
+    }
+    .hero-name:hover { animation: glitch .35s steps(1) forwards; }
+
+    /* links row */
+    .hero-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 36px;
+      opacity: 0;
+      animation: fadeUp .6s .9s forwards;
+    }
+    .hlink {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid rgba(0,255,65,.35);
+      color: var(--g);
+      text-decoration: none;
+      font-size: 12px;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      transition: border-color .25s, box-shadow .25s, color .25s, background .25s;
+      position: relative;
+      overflow: hidden;
+    }
+    .hlink::before {
+      content: "";
+      position: absolute;
+      left: -100%; top: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, var(--g3), transparent);
+      transition: left .4s;
+    }
+    .hlink:hover::before { left: 100%; }
+    .hlink:hover {
+      border-color: var(--g);
+      box-shadow: var(--glow);
+      color: #fff;
+    }
+    .hlink.primary {
+      border-color: var(--b);
+      color: var(--b);
+    }
+    .hlink.primary:hover {
+      box-shadow: var(--glow-b);
+      border-color: var(--b);
+      background: rgba(0,212,255,.08);
+    }
+
+    /* nav bar */
+    .hero-nav {
+      margin-top: 52px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(0,255,65,.15);
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      opacity: 0;
+      animation: fadeUp .6s 1.1s forwards;
+    }
+    .hero-nav a {
+      color: var(--dim);
+      text-decoration: none;
+      font-size: 13px;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      transition: color .2s;
+      position: relative;
+    }
+    .hero-nav a::after {
+      content:"";
+      position: absolute;
+      bottom:-4px; left:0;
+      width:0; height:1px;
+      background: var(--g);
+      transition: width .3s;
+    }
+    .hero-nav a:hover { color: var(--g); }
+    .hero-nav a:hover::after { width:100%; }
+
+    /* scroll cue */
+    .scroll-cue {
+      position: absolute;
+      bottom: 30px;
+      left: 0;
+      font-size: 11px;
+      color: var(--dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      animation: fadeUp .5s 1.5s forwards;
+    }
+    .scroll-cue span { display:inline-block; animation: scrollBob 1.6s ease-in-out infinite; }
+    @keyframes scrollBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
+
+    /* ── section base ── */
+    .section {
+      padding: 80px 0 0;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s, transform .7s;
+    }
+    .section.visible { opacity:1; transform:none; }
+
+    .sec-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 40px;
+    }
+    .sec-tag {
+      font-size: 10px;
+      color: var(--o);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      writing-mode: vertical-rl;
+      opacity: .7;
+    }
+    .sec-title {
+      font-family: 'Oxanium', monospace;
+      font-weight: 600;
+      font-size: 28px;
+      color: var(--g);
+      letter-spacing: .05em;
+    }
+    .sec-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, rgba(0,255,65,.3), transparent);
+    }
+
+    /* ── about ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 340px;
+      gap: 48px;
+      align-items: start;
+    }
+    .about-text p {
+      font-size: 14px;
+      line-height: 2;
+      color: var(--text);
+      margin-bottom: 18px;
+    }
+    .about-text .hl { color: var(--b); }
+    .about-text a { color: var(--o); text-decoration: none; border-bottom: 1px dotted var(--o); }
+    .about-text a:hover { color: var(--g); border-bottom-color: var(--g); }
+
+    /* research interests panel */
+    .interests-panel {
+      border: 1px solid rgba(0,255,65,.2);
+      background: rgba(0,255,65,.04);
+      padding: 24px;
+    }
+    .interests-panel h3 {
+      font-size: 11px;
+      letter-spacing: .2em;
+      color: var(--o);
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .interest-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      font-size: 13px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(0,255,65,.1);
+      color: var(--text);
+      transition: color .2s, padding-left .2s;
+    }
+    .interest-item:last-child { border-bottom: none; }
+    .interest-item:hover { color: var(--g); padding-left: 6px; }
+    .interest-item::before {
+      content: "▸";
+      color: var(--g);
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* skills row */
+    .skills-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 24px;
+    }
+    .skill-chip {
+      background: rgba(0,212,255,.07);
+      border: 1px solid rgba(0,212,255,.25);
+      color: var(--b);
+      font-size: 12px;
+      padding: 5px 12px;
+      letter-spacing: .05em;
+    }
+
+    /* ── education ── */
+    .edu-items { display: flex; flex-direction: column; gap: 24px; }
+    .edu-item {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 20px;
+      padding: 24px;
+      border: 1px solid rgba(0,255,65,.12);
+      background: rgba(0,255,65,.02);
+      position: relative;
+      transition: border-color .25s, background .25s;
+    }
+    .edu-item::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 0; bottom: 0;
+      width: 3px;
+      background: var(--g);
+      box-shadow: 0 0 10px var(--g);
+      opacity: 0;
+      transition: opacity .25s;
+    }
+    .edu-item:hover { border-color: rgba(0,255,65,.35); background: rgba(0,255,65,.05); }
+    .edu-item:hover::before { opacity: 1; }
+
+    .edu-year {
+      font-size: 12px;
+      color: var(--dim);
+      padding-top: 3px;
+    }
+    .edu-degree {
+      font-size: 15px;
+      color: var(--g);
+      margin-bottom: 5px;
+    }
+    .edu-school {
+      font-size: 13px;
+      color: var(--b);
+      margin-bottom: 4px;
+    }
+    .edu-detail { font-size: 12px; color: var(--dim); }
+
+    /* ── publications ── */
+    .pub-items { display:flex; flex-direction:column; gap:20px; }
+    .pub-item {
+      padding: 24px;
+      border: 1px solid rgba(0,255,65,.12);
+      background: rgba(0,255,65,.02);
+      position: relative;
+      transition: border-color .25s;
+    }
+    .pub-item:hover { border-color: rgba(0,255,65,.3); }
+    .pub-num {
+      position: absolute;
+      top: -10px; left: 20px;
+      background: var(--bg);
+      padding: 0 8px;
+      font-size: 11px;
+      color: var(--o);
+      letter-spacing:.12em;
+    }
+    .pub-title {
+      font-size: 14px;
+      color: var(--g);
+      line-height: 1.6;
+      margin-bottom: 10px;
+    }
+    .pub-venue {
+      font-size: 12px;
+      color: var(--b);
+      margin-bottom: 6px;
+    }
+    .pub-note { font-size: 12px; color: var(--dim); font-style: italic; }
+
+    /* ── projects ── */
+    .proj-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    .proj-card {
+      border: 1px solid rgba(0,255,65,.15);
+      padding: 28px;
+      background: rgba(0,255,65,.02);
+      position: relative;
+      overflow: hidden;
+      transition: border-color .3s, transform .3s;
+    }
+    .proj-card:hover {
+      border-color: rgba(0,255,65,.4);
+      transform: translateY(-3px);
+    }
+    .proj-card::after {
+      content: "";
+      position: absolute;
+      bottom:0; right:0;
+      width: 40px; height: 40px;
+      border-top: 1px solid rgba(0,255,65,.2);
+      border-left: 1px solid rgba(0,255,65,.2);
+      pointer-events: none;
+    }
+    .proj-icon { font-size: 22px; margin-bottom: 12px; }
+    .proj-title {
+      font-size: 15px;
+      color: var(--g);
+      margin-bottom: 8px;
+    }
+    .proj-desc { font-size: 13px; color: var(--dim); line-height: 1.7; margin-bottom: 16px; }
+    .proj-link {
+      font-size: 12px;
+      color: var(--o);
+      text-decoration: none;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      border-bottom: 1px solid rgba(255,149,0,.3);
+      transition: color .2s, border-color .2s;
+    }
+    .proj-link:hover { color: var(--g); border-color: var(--g); }
+
+    /* ── experience ── */
+    .exp-timeline { position: relative; padding-left: 28px; }
+    .exp-timeline::before {
+      content: "";
+      position: absolute;
+      left: 0; top: 6px; bottom: 0;
+      width: 1px;
+      background: linear-gradient(180deg, var(--g), transparent);
+    }
+    .exp-item {
+      position: relative;
+      margin-bottom: 40px;
+      padding: 24px;
+      border: 1px solid rgba(0,255,65,.12);
+      background: rgba(0,255,65,.02);
+      transition: border-color .25s;
+    }
+    .exp-item::before {
+      content: "●";
+      position: absolute;
+      left: -34px; top: 26px;
+      color: var(--g);
+      font-size: 10px;
+      text-shadow: var(--glow);
+    }
+    .exp-item:hover { border-color: rgba(0,255,65,.3); }
+
+    .exp-role {
+      font-size: 15px;
+      color: var(--g);
+      margin-bottom: 4px;
+    }
+    .exp-org {
+      font-size: 13px;
+      color: var(--b);
+      margin-bottom: 4px;
+    }
+    .exp-period {
+      font-size: 11px;
+      color: var(--o);
+      margin-bottom: 12px;
+      letter-spacing: .08em;
+    }
+    .exp-duties { font-size: 13px; color: var(--dim); line-height: 1.8; }
+
+    /* ── interactive terminal ── */
+    .terminal-section {
+      padding: 80px 0 0;
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity .7s, transform .7s;
+    }
+    .terminal-section.visible { opacity:1; transform:none; }
+
+    .term-window {
+      border: 1px solid rgba(0,255,65,.3);
+      background: rgba(0,0,0,.4);
+      overflow: hidden;
+    }
+    .term-titlebar {
+      background: rgba(0,255,65,.1);
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-bottom: 1px solid rgba(0,255,65,.15);
+    }
+    .term-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .term-dot.red    { background: #ff5f56; }
+    .term-dot.yellow { background: #ffbd2e; }
+    .term-dot.green  { background: #27c93f; }
+    .term-title-text { flex:1; text-align:center; font-size:12px; color:var(--dim); }
+
+    .term-body {
+      padding: 20px;
+      font-size: 13px;
+      min-height: 220px;
+      max-height: 340px;
+      overflow-y: auto;
+    }
+    .term-body::-webkit-scrollbar { width:4px; }
+    .term-body::-webkit-scrollbar-track { background: rgba(0,255,65,.05); }
+    .term-body::-webkit-scrollbar-thumb { background: rgba(0,255,65,.3); }
+
+    .term-line { line-height: 1.7; margin-bottom: 2px; }
+    .term-prompt { color: var(--o); }
+    .term-cmd   { color: var(--g); }
+    .term-out   { color: var(--dim); margin-left: 0; }
+    .term-link  { color: var(--b); text-decoration:none; }
+    .term-link:hover { text-decoration: underline; }
+    .term-error { color: var(--r); }
+
+    .term-input-row {
+      display: flex;
+      align-items: center;
+      padding: 10px 20px 16px;
+      border-top: 1px solid rgba(0,255,65,.1);
+      gap: 8px;
+    }
+    .term-input-prompt { color: var(--o); font-size: 13px; white-space: nowrap; }
+    .term-input {
+      flex: 1;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--g);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      caret-color: var(--g);
+    }
+
+    /* ── footer ── */
+    .footer {
+      margin-top: 100px;
+      padding: 30px 0;
+      border-top: 1px solid rgba(0,255,65,.15);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: var(--dim);
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .footer-sig { color: var(--g); font-family: 'Oxanium', monospace; font-size: 14px; }
+
+    /* ── animations ── */
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(16px); }
+      to   { opacity:1; transform: none; }
+    }
+
+    /* responsive */
+    @media (max-width: 800px) {
+      .about-grid { grid-template-columns: 1fr; }
+      .edu-item { grid-template-columns: 1fr; gap:8px; }
+      .edu-year { font-size:11px; }
+      .footer { flex-direction:column; }
+    }
+    @media (max-width: 540px) {
+      .hero-name { font-size: 32px; }
+      .sec-title { font-size: 22px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CRT overlays -->
+  <div class="crt-scanlines"></div>
+  <div class="crt-vignette"></div>
+  <div class="crt-bleed"></div>
+
+  <!-- Custom cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-trail"></div>
+
+  <!-- Starfield canvas -->
+  <canvas id="starCanvas"></canvas>
+
+  <div class="page">
+
+    <!-- ── HERO ── -->
+    <section class="hero">
+      <div class="hero-topbar">
+        <span>UPLINK: ESTABLISHED</span>
+        <span id="clock"></span>
+        <span>LAT: 40.4259° N &nbsp;|&nbsp; LON: 86.9081° W</span>
+      </div>
+
+      <div class="hero-label">// personnel file :: deep-space-node-07</div>
+
+      <h1 class="hero-name" data-text="Aravind Gitamuralee">Aravind Gitamuralee</h1>
+
+      <div class="hero-role">
+        <span class="tag">PhD Candidate</span>
+        <span class="tag">ECE · Purdue University</span>
+        <span class="tag">AI · IoT · Comms</span>
+        <span class="tag">Origin: Kerala, India 🌿</span>
+      </div>
+
+      <div class="hero-links">
+        <a href="./Resources/Aravind_CV_2.25.pdf" class="hlink primary" target="_blank">↓ CV</a>
+        <a href="https://github.com/agm-19" class="hlink" target="_blank">GitHub</a>
+        <a href="https://linkedin.com/in/aravindvenma" class="hlink" target="_blank">LinkedIn</a>
+        <a href="https://scholar.google.co.in/citations?user=fBL3iMkAAAAJ&hl=en&oi=sra" class="hlink" target="_blank">Scholar</a>
+        <a href="mailto:amuralee@purdue.edu" class="hlink" target="_blank">Email</a>
+        <a href="https://x.com/hackervind" class="hlink" target="_blank">Twitter</a>
+        <a href="https://instagram.com/aravindey" class="hlink" target="_blank">Instagram</a>
+        <a href="https://www.youtube.com/@aravindalokam" class="hlink" target="_blank">YouTube</a>
+      </div>
+
+      <nav class="hero-nav">
+        <a href="#about">About</a>
+        <a href="#education">Education</a>
+        <a href="#publications">Publications</a>
+        <a href="#projects">Projects</a>
+        <a href="#experience">Experience</a>
+        <a href="#terminal">Terminal</a>
+      </nav>
+
+      <div class="scroll-cue">
+        <span>▾</span> scroll to explore
+      </div>
+    </section>
+
+    <!-- ── ABOUT ── -->
+    <section class="section" id="about">
+      <div class="sec-header">
+        <span class="sec-tag">01</span>
+        <h2 class="sec-title">About</h2>
+        <div class="sec-line"></div>
+      </div>
+
+      <div class="about-grid">
+        <div class="about-text">
+          <img src="./Resources/IITK.jpg" alt="Aravind Gitamuralee"
+  style="width:180px; border:1px solid rgba(0,255,65,.3); filter:grayscale(20%) contrast(1.1); margin-bottom:24px;" />
+          <p>
+            Welcome to my internet space — <span class="hl">अरविन्दलोकम्</span>.
+            I'm officially <span class="hl">Aravind Muraleedharan</span>, though my friends call me 
+            <span class="hl">G</span>. My surname <em>gitamuralee</em> is a combination of both my parents' names — 
+            a small tribute I've chosen to carry.
+          </p>
+          <p>
+            I grew up along the southwestern coastline of India, in <span class="hl">Thiruvananthapuram, Kerala</span> — 
+            a city of monsoons, backwaters, and an unusually deep love for engineering education.
+          </p>
+          <p>
+            Currently a second year <span class="hl">PhD student in Electrical & Computer Engineering</span> at Purdue University, working with Dr. Kwang Taik Kim. 
+            I also have a <span class="hl">Master's</span> degree in in Electrical Engineering from the Indian Institute of Technology at Kanpur, where my interest was in information theory and communication systems. I'm broadly interested in building AI systems that can sense, 
+            communicate, and act intelligently in the physical world.
+          </p>
+          <p>
+            I write occasionally about science, philosophy, and the spaces between them — find me at 
+            <a href="https://sciphisix.blogspot.com" target="_blank">sciphisix.blogspot.com</a>.
+          </p>
+          <div id="latest-post" style="font-size:13px;margin-top:8px;color:var(--dim);">Loading...</div>
+
+          <div class="skills-row">
+            <span class="skill-chip">Python</span>
+            <span class="skill-chip">MATLAB</span>
+            <span class="skill-chip">C / Embedded</span>
+            <span class="skill-chip">Zigbee · BLE · LoRa</span>
+            <span class="skill-chip">Machine Learning</span>
+            <span class="skill-chip">Signal Processing</span>
+            <span class="skill-chip">IoT Systems</span>
+          </div>
+        </div>
+
+        <div class="interests-panel">
+          <h3>// Research Interests</h3>
+          <div class="interest-item">AI-Driven Intelligent Systems</div>
+          <div class="interest-item">Internet of Things</div>
+          <div class="interest-item">Wireless Communication Networks</div>
+          <div class="interest-item">Molecular Communication</div>
+          <div class="interest-item">Robotics & Autonomous Systems</div>
+          <div class="interest-item">Signal Processing</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── EDUCATION ── -->
+    <section class="section" id="education">
+      <div class="sec-header">
+        <span class="sec-tag">02</span>
+        <h2 class="sec-title">Education</h2>
+        <div class="sec-line"></div>
+      </div>
+
+      <div class="edu-items">
+        <div class="edu-item">
+          <div class="edu-year">2024 –<br>Present</div>
+          <div>
+            <div class="edu-degree">PhD in Electrical &amp; Computer Engineering</div>
+            <div class="edu-school">Purdue University, West Lafayette, USA</div>
+            <div class="edu-detail">Joined Fall 2024 · Teaching Assistant</div>
+          </div>
+        </div>
+        <div class="edu-item">
+          <div class="edu-year">2022 –<br>2024</div>
+          <div>
+            <div class="edu-degree">MS (By Research) in Electrical Engineering</div>
+            <div class="edu-school">Indian Institute of Technology, Kanpur</div>
+            <div class="edu-detail">Research focus: Molecular Communication Systems</div>
+          </div>
+        </div>
+        <div class="edu-item">
+          <div class="edu-year">2015 –<br>2019</div>
+          <div>
+            <div class="edu-degree">B.Tech (Hons) in Electronics &amp; Communication Engineering</div>
+            <div class="edu-school">TKM College of Engineering, Kollam, Kerala</div>
+            <div class="edu-detail">Graduated with Honours</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PUBLICATIONS ── -->
+    <section class="section" id="publications">
+      <div class="sec-header">
+        <span class="sec-tag">03</span>
+        <h2 class="sec-title">Publications</h2>
+        <div class="sec-line"></div>
+      </div>
+
+      <div class="pub-items">
+        <div class="pub-item">
+          <span class="pub-num">PUB-002 · 2025</span>
+          <div class="pub-title">
+            "Optimal Transmission Sequence Design with ISI Matching in Molecular Communication"
+          </div>
+          <div class="pub-venue">National Conference on Communications, 2025</div>
+<a href="https://doi.org/10.1109/NCC63735.2025.10982844" class="proj-link" target="_blank" style="font-size:12px;">DOI →</a>
+          <div class="pub-note">Addresses inter-symbol interference in diffusion-based molecular channels — a key bottleneck for nano-scale communication systems.</div>
+        </div>
+        <div class="pub-item">
+          <span class="pub-num">PUB-001 · 2020</span>
+          <div class="pub-title">
+            "An inexpensive Unmanned Aquatic Vehicle for Underwater Human Detection"
+          </div>
+          <div class="pub-venue">American Institute of Physics Conference Proceedings, 2020</div>
+          <div class="pub-note">Low-cost autonomous aquatic search-and-rescue platform with real-time detection capability.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── PROJECTS ── -->
+    <section class="section" id="projects">
+      <div class="sec-header">
+        <span class="sec-tag">04</span>
+        <h2 class="sec-title">Projects</h2>
+        <div class="sec-line"></div>
+      </div>
+
+      <div class="proj-grid">
+        <div class="proj-card">
+          <div class="proj-icon">♪</div>
+          <div class="proj-title">Music Notes Transpose</div>
+          <div class="proj-desc">A browser-based tool to transpose music notes across keys — useful for musicians moving pieces between instruments or vocal ranges.</div>
+          <a href="./Projects/MTranspose.html" class="proj-link">Launch Demo →</a>
+        </div>
+        <!-- placeholder cards to suggest adding more -->
+        <div class="proj-card" style="opacity:.35; pointer-events:none; border-style:dashed;">
+          <div class="proj-icon" style="color:var(--dim);">+</div>
+          <div class="proj-title" style="color:var(--dim);">More coming soon</div>
+          <div class="proj-desc">This section will expand as projects are added.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── EXPERIENCE ── -->
+    <section class="section" id="experience">
+      <div class="sec-header">
+        <span class="sec-tag">05</span>
+        <h2 class="sec-title">Experience</h2>
+        <div class="sec-line"></div>
+      </div>
+
+      <div class="exp-timeline">
+        <div class="exp-item">
+          <div class="exp-role">Teaching Assistant</div>
+          <div class="exp-org">Purdue University, West Lafayette</div>
+          <div class="exp-period">2024 – PRESENT</div>
+          <div class="exp-duties">
+            ECE 362 — Microprocessor Systems &amp; Interfacing (Spring 2025)<br>
+            ECE 301 — Signals &amp; Systems (Fall 2024)
+          </div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-role">Teaching Assistant</div>
+          <div class="exp-org">IIT Kanpur</div>
+          <div class="exp-period">2022 – 2023</div>
+          <div class="exp-duties">
+            ESC 201 — Introduction to Electronics
+          </div>
+        </div>
+        <div class="exp-item">
+          <div class="exp-role">Firmware Engineer</div>
+          <div class="exp-org">Tismo Tech, Bengaluru, India</div>
+          <div class="exp-period">2019 – 2020</div>
+          <div class="exp-duties">
+            Developed wireless communication firmware for IoT devices across Zigbee, BLE, and LoRa protocols. 
+            Built embedded systems for industrial and commercial deployments.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── INTERACTIVE TERMINAL ── -->
+    <section class="terminal-section" id="terminal">
+      <div class="sec-header">
+        <span class="sec-tag">06</span>
+        <h2 class="sec-title">Terminal</h2>
+        <div class="sec-line"></div>
+      </div>
+
+      <div class="term-window">
+        <div class="term-titlebar">
+          <div class="term-dot red"></div>
+          <div class="term-dot yellow"></div>
+          <div class="term-dot green"></div>
+          <div class="term-title-text">aravind@purdue-node:~</div>
+        </div>
+        <div class="term-body" id="termBody">
+          <div class="term-line"><span class="term-out">Deep Space Terminal — type <span class="term-cmd">help</span> for available commands.</span></div>
+          <div class="term-line">&nbsp;</div>
+        </div>
+        <div class="term-input-row">
+          <span class="term-input-prompt">aravind@purdue:~$&nbsp;</span>
+          <input class="term-input" id="termInput" type="text" autocomplete="off" autofocus placeholder="type a command..." spellcheck="false" />
+        </div>
+      </div>
+    </section>
+
+    <!-- footer -->
+    <footer class="footer">
+      <div class="footer-sig">Aravind Gitamuralee</div>
+      <div>© 2025 · All rights reserved · <a href="mailto:amuralee@purdue.edu" style="color:var(--g);text-decoration:none;">amuralee@purdue.edu</a></div>
+      <div id="footerClock" style="color:var(--dim);">—</div>
+    </footer>
+
+  </div><!-- /page -->
+
+  <script>
+  // ── Cursor ──────────────────────────────────────────────
+  const cursor = document.getElementById('cursor');
+  const trail  = document.getElementById('cursor-trail');
+  document.addEventListener('mousemove', e => {
+    cursor.style.left = e.clientX + 'px';
+    cursor.style.top  = e.clientY + 'px';
+    trail.style.left  = e.clientX + 'px';
+    trail.style.top   = e.clientY + 'px';
+  });
+  document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
+  document.addEventListener('mouseup',   () => cursor.classList.remove('clicking'));
+
+  // ── Clock ───────────────────────────────────────────────
+  function tick() {
+    const s = new Date().toUTCString().slice(17, 25);
+    document.getElementById('clock').textContent = `UTC: ${s}`;
+    document.getElementById('footerClock').textContent = new Date().toLocaleDateString('en-IN', { year:'numeric', month:'long' });
+  }
+  tick();
+  setInterval(tick, 1000);
+
+  // ── Starfield ────────────────────────────────────────────
+  const canvas = document.getElementById('starCanvas');
+  const ctx    = canvas.getContext('2d');
+  let W, H, stars = [];
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); initStars(); });
+
+  function initStars() {
+    stars = [];
+    for (let i = 0; i < 280; i++) {
+      stars.push({
+        x: Math.random() * W,
+        y: Math.random() * H,
+        r: Math.random() * 1.3,
+        a: Math.random(),
+        speed: 0.002 + Math.random() * 0.008,
+        phase: Math.random() * Math.PI * 2,
+        layer: Math.floor(Math.random() * 3) // 0=far,1=mid,2=near
+      });
+    }
+  }
+  initStars();
+
+  // parallax data
+  let mx = 0, my = 0;
+  window.addEventListener('mousemove', e => {
+    mx = (e.clientX / window.innerWidth  - 0.5) * 2;
+    my = (e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  const layerDepth = [0.5, 1.5, 3]; // px parallax per layer
+  const layerAlpha = [0.35, 0.6, 1];
+
+  let t = 0;
+  function drawStars() {
+    ctx.clearRect(0, 0, W, H);
+    t += 0.016;
+    for (const s of stars) {
+      const px = s.x + mx * layerDepth[s.layer];
+      const py = s.y + my * layerDepth[s.layer];
+      const alpha = layerAlpha[s.layer] * (0.4 + 0.6 * Math.sin(t * s.speed * 60 + s.phase));
+      ctx.beginPath();
+      ctx.arc(px, py, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = s.layer === 2 ? `rgba(0,255,65,${alpha * 0.6})` : `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    }
+    // occasional shooting star
+    if (Math.random() < 0.003) shootingStar();
+    requestAnimationFrame(drawStars);
+  }
+  drawStars();
+
+  let shooters = [];
+  function shootingStar() {
+    shooters.push({ x: Math.random()*W, y: Math.random()*(H/2), len:0, speed:14, angle: Math.PI/5, life:1 });
+  }
+  // integrate shooters into draw loop — extend frame
+  const _orig = drawStars;
+  function drawAll() {
+    ctx.clearRect(0,0,W,H);
+    t += 0.016;
+    for (const s of stars) {
+      const px = s.x + mx * layerDepth[s.layer];
+      const py = s.y + my * layerDepth[s.layer];
+      const alpha = layerAlpha[s.layer] * (0.4 + 0.6 * Math.sin(t * s.speed * 60 + s.phase));
+      ctx.beginPath();
+      ctx.arc(px, py, s.r, 0, Math.PI*2);
+      ctx.fillStyle = s.layer===2 ? `rgba(0,255,65,${alpha*0.6})` : `rgba(255,255,255,${alpha})`;
+      ctx.fill();
+    }
+    if (Math.random()<0.003) shootingStar();
+    shooters = shooters.filter(sh => sh.life > 0);
+    for (const sh of shooters) {
+      sh.x += Math.cos(sh.angle) * sh.speed;
+      sh.y += Math.sin(sh.angle) * sh.speed;
+      sh.len = Math.min(sh.len + sh.speed, 80);
+      sh.life -= 0.03;
+      ctx.beginPath();
+      ctx.moveTo(sh.x, sh.y);
+      ctx.lineTo(sh.x - Math.cos(sh.angle)*sh.len, sh.y - Math.sin(sh.angle)*sh.len);
+      const g = ctx.createLinearGradient(sh.x,sh.y,sh.x-Math.cos(sh.angle)*sh.len,sh.y-Math.sin(sh.angle)*sh.len);
+      g.addColorStop(0, `rgba(255,255,255,${sh.life})`);
+      g.addColorStop(1, 'transparent');
+      ctx.strokeStyle = g;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    }
+    requestAnimationFrame(drawAll);
+  }
+  // replace the first draw call
+  cancelAnimationFrame(drawStars);
+  drawAll();
+
+  // ── Scroll reveal ─────────────────────────────────────────
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.section, .terminal-section').forEach(el => obs.observe(el));
+
+  // ── Interactive Terminal ───────────────────────────────────
+  const termBody  = document.getElementById('termBody');
+  const termInput = document.getElementById('termInput');
+  const history   = [];
+  let histIdx     = -1;
+
+  const commands = {
+    help: () => [
+      { type:'out', text:'Available commands:' },
+      { type:'out', text:'  <span class="term-cmd">about</span>       — who am I' },
+      { type:'out', text:'  <span class="term-cmd">education</span>   — academic history' },
+      { type:'out', text:'  <span class="term-cmd">research</span>    — interests &amp; publications' },
+      { type:'out', text:'  <span class="term-cmd">skills</span>      — tech stack' },
+      { type:'out', text:'  <span class="term-cmd">contact</span>     — get in touch' },
+      { type:'out', text:'  <span class="term-cmd">blog</span>        — my writings' },
+      { type:'out', text:'  <span class="term-cmd">clear</span>       — clear terminal' },
+    ],
+    about: () => [
+      { type:'out', text:'Aravind Gitamuralee — also known as G.' },
+      { type:'out', text:'PhD candidate at Purdue (ECE). IIT Kanpur alumnus.' },
+      { type:'out', text:'From Thiruvananthapuram, Kerala, India.' },
+      { type:'out', text:'Building intelligent systems that sense, talk, and act.' },
+    ],
+    education: () => [
+      { type:'out', text:'[ PhD ] Electrical &amp; Computer Eng. — Purdue University (2024–present)' },
+      { type:'out', text:'[ MS  ] Electrical Engineering — IIT Kanpur (2024)' },
+      { type:'out', text:'[ BTech ] Electronics &amp; Communication — TKM College (2019)' },
+    ],
+    research: () => [
+      { type:'out', text:'Interests: AI systems, IoT, comm networks, molecular comm, robotics.' },
+      { type:'out', text:'' },
+      { type:'out', text:'Publications:' },
+      { type:'out', text:'  [2025] ISI Matching in Molecular Communication — NCC 2025' },
+      { type:'out', text:'  [2020] Unmanned Aquatic Vehicle for Human Detection — AIP Conf.' },
+    ],
+    skills: () => [
+      { type:'out', text:'Languages  : Python · MATLAB · C · Embedded C' },
+      { type:'out', text:'Protocols  : Zigbee · BLE · LoRa · WiFi' },
+      { type:'out', text:'Domains    : Signal Processing · ML · IoT · Firmware' },
+    ],
+    contact: () => [
+      { type:'out', text:'Email  : <a class="term-link" href="mailto:amuralee@purdue.edu">amuralee@purdue.edu</a>' },
+      { type:'out', text:'Twitter: <a class="term-link" href="https://x.com/hackervind" target="_blank">@hackervind</a>' },
+      { type:'out', text:'GitHub : <a class="term-link" href="https://github.com/agm-19" target="_blank">github.com/agm-19</a>' },
+    ],
+    blog: () => [
+      { type:'out', text:'I write about science, philosophy, and the spaces between.' },
+      { type:'out', text:'→ <a class="term-link" href="https://sciphisix.blogspot.com" target="_blank">sciphisix.blogspot.com</a>' },
+    ],
+    clear: () => 'CLEAR',
+    ls: () => [
+      { type:'out', text:'about/  education/  publications/  projects/  experience/  blog/' },
+    ],
+    whoami: () => [{ type:'out', text:'aravind — researcher, engineer, writer, malayali.' }],
+    date: () => [{ type:'out', text: new Date().toUTCString() }],
+    sudo: () => [{ type:'error', text: 'Nice try. Permission denied.' }],
+    exit: () => [{ type:'out', text: 'There is no escape from curiosity.' }],
+    kerala: () => [
+      { type:'out', text: '🌿 God\'s Own Country. Monsoons, toddy, backwaters, and the best engineers in India.' }
+    ],
+    purdue: () => [{ type:'out', text: 'Boiler up! 🚂' }],
+  };
+
+  function printLine(html, cls='term-out') {
+    const div = document.createElement('div');
+    div.className = 'term-line';
+    div.innerHTML = `<span class="${cls}">${html}</span>`;
+    termBody.appendChild(div);
+    termBody.scrollTop = termBody.scrollHeight;
+  }
+
+  function runCommand(raw) {
+    const cmd = raw.trim().toLowerCase();
+    printLine(`<span class="term-prompt">aravind@purdue:~$</span> <span class="term-cmd">${raw}</span>`, '');
+    if (!cmd) return;
+    history.unshift(raw);
+    histIdx = -1;
+
+    if (commands[cmd]) {
+      const result = commands[cmd]();
+      if (result === 'CLEAR') {
+        termBody.innerHTML = '';
+        return;
+      }
+      result.forEach(r => printLine(r.text, r.type === 'error' ? 'term-error' : 'term-out'));
+    } else {
+      printLine(`command not found: ${cmd}. Type <span class="term-cmd">help</span> to see available commands.`, 'term-error');
+    }
+    printLine('', 'term-out');
+  }
+
+  termInput.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      runCommand(termInput.value);
+      termInput.value = '';
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      if (histIdx < history.length - 1) { histIdx++; termInput.value = history[histIdx]; }
+    } else if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      if (histIdx > 0) { histIdx--; termInput.value = history[histIdx]; }
+      else { histIdx=-1; termInput.value=''; }
+    }
+  });
+
+  // auto-type welcome sequence
+  const seq = ['help', 'about'];
+  let si = 0;
+  function autoType() {
+    if (si >= seq.length) return;
+    runCommand(seq[si++]);
+    setTimeout(autoType, 800);
+  }
+  setTimeout(autoType, 1200);
+
+
+    fetch('https://sciphisix.blogspot.com/feeds/posts/default?alt=json')
+  .then(r => r.json())
+  .then(data => {
+    const latest = data.feed.entry[0];
+    const title  = latest.title.$t;
+    const link   = latest.link.find(l => l.rel === 'alternate').href;
+    document.getElementById('latest-post').innerHTML =
+      `Latest: <a href="${link}" target="_blank" style="color:var(--o);border-bottom:1px dotted var(--o);">${title}</a>`;
+  });
+ 
+  </script>
+</body>
+</html>
