@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aravind Gitamuralee — Deep Space Terminal</title>
+  <title>127.0.0.1</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,700;1,300&family=Oxanium:wght@300;600;800&display=swap" rel="stylesheet" />
 
   <style>
-    /* ── reset & root ── */
+    /* -- reset & root -- */
     *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
     :root {
       --g: #00ff41;       /* phosphor green */
@@ -36,7 +36,7 @@
       cursor: none;
     }
 
-    /* ── custom cursor ── */
+    /* custom cursor -- lol  yeah */ 
     #cursor {
       position: fixed;
       width: 14px; height: 14px;
@@ -60,7 +60,7 @@
       transition: left .08s, top .08s;
     }
 
-    /* ── canvas starfield ── */
+    /* -- canvas starfield -- nice name though ili */
     #starCanvas {
       position: fixed;
       inset: 0;
@@ -68,7 +68,7 @@
       pointer-events: none;
     }
 
-    /* ── CRT overlay layers ── */
+    /* -- CRT overlay layers; something cool here -- */
     .crt-scanlines {
       position: fixed; inset: 0;
       background: repeating-linear-gradient(
@@ -102,10 +102,10 @@
       100% { top: 100vh; opacity:.3; }
     }
 
-    /* ── page layout ── */
+    /* -- layout -- */
     .page { position: relative; z-index: 10; max-width: 1100px; margin: 0 auto; padding: 0 28px 100px; }
 
-    /* ── hero ── */
+    /* -- shammy hero aada -- */
     .hero {
       min-height: 100vh;
       display: flex;
@@ -149,7 +149,7 @@
       animation: fadeUp .7s .5s forwards;
       position: relative;
     }
-    /* chromatic aberration on name */
+    /* ichiri chromatic aberration irikkatte */
     .hero-name::before {
       content: attr(data-text);
       position: absolute;
@@ -184,7 +184,7 @@
       margin: 4px 4px 0 0;
     }
 
-    /* glitch flash */
+    /* glitch flash omg */
     @keyframes glitch {
       0%,100% { clip-path: none; transform: none; }
       20%  { clip-path: polygon(0 30%, 100% 30%, 100% 40%, 0 40%); transform: translateX(-4px); }
@@ -242,7 +242,7 @@
       background: rgba(0,212,255,.08);
     }
 
-    /* nav bar */
+    /* navi bar */
     .hero-nav {
       margin-top: 52px;
       padding-top: 20px;
@@ -289,7 +289,7 @@
     .scroll-cue span { display:inline-block; animation: scrollBob 1.6s ease-in-out infinite; }
     @keyframes scrollBob { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
 
-    /* ── section base ── */
+    /* section base */
     .section {
       padding: 80px 0 0;
       opacity: 0;
@@ -325,7 +325,7 @@
       background: linear-gradient(90deg, rgba(0,255,65,.3), transparent);
     }
 
-    /* ── about ── */
+    /* about  */
     .about-grid {
       display: grid;
       grid-template-columns: 1fr 340px;
@@ -390,7 +390,7 @@
       letter-spacing: .05em;
     }
 
-    /* ── education ── */
+    /* -- vidhyaaabhyasam */
     .edu-items { display: flex; flex-direction: column; gap: 24px; }
     .edu-item {
       display: grid;
@@ -432,7 +432,7 @@
     }
     .edu-detail { font-size: 12px; color: var(--dim); }
 
-    /* ── publications ── */
+    /* -- publications -- */
     .pub-items { display:flex; flex-direction:column; gap:20px; }
     .pub-item {
       padding: 24px;
@@ -464,7 +464,7 @@
     }
     .pub-note { font-size: 12px; color: var(--dim); font-style: italic; }
 
-    /* ── projects ── */
+    /* -- projects -- */
     .proj-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -509,7 +509,7 @@
     }
     .proj-link:hover { color: var(--g); border-color: var(--g); }
 
-    /* ── experience ── */
+    /* -- experience -- */
     .exp-timeline { position: relative; padding-left: 28px; }
     .exp-timeline::before {
       content: "";
@@ -554,7 +554,7 @@
     }
     .exp-duties { font-size: 13px; color: var(--dim); line-height: 1.8; }
 
-    /* ── interactive terminal ── */
+    /* -- interactive terminal -- */
     .terminal-section {
       padding: 80px 0 0;
       opacity: 0;
@@ -620,7 +620,7 @@
       caret-color: var(--g);
     }
 
-    /* ── footer ── */
+    /* -- footer -- */
     .footer {
       margin-top: 100px;
       padding: 30px 0;
@@ -635,7 +635,7 @@
     }
     .footer-sig { color: var(--g); font-family: 'Oxanium', monospace; font-size: 14px; }
 
-    /* ── animations ── */
+    /* -- animations -- */
     @keyframes fadeUp {
       from { opacity:0; transform: translateY(16px); }
       to   { opacity:1; transform: none; }
@@ -670,7 +670,7 @@
 
   <div class="page">
 
-    <!-- ── HERO ── -->
+    <!-- HERO -->
     <section class="hero">
       <div class="hero-topbar">
         <span>UPLINK: ESTABLISHED</span>
@@ -770,7 +770,7 @@
       </div>
     </section>
 
-    <!-- ── EDUCATION ── -->
+    <!-- EDUCATION -->
     <section class="section" id="education">
       <div class="sec-header">
         <span class="sec-tag">02</span>
@@ -806,7 +806,7 @@
       </div>
     </section>
 
-    <!-- ── PUBLICATIONS ── -->
+    <!-- PUBLICATIONS -->
     <section class="section" id="publications">
       <div class="sec-header">
         <span class="sec-tag">03</span>
@@ -835,7 +835,7 @@
       </div>
     </section>
 
-    <!-- ── PROJECTS ── -->
+    <!-- PROJECTS -->
     <section class="section" id="projects">
       <div class="sec-header">
         <span class="sec-tag">04</span>
@@ -850,7 +850,7 @@
           <div class="proj-desc">A browser-based tool to transpose music notes across keys — useful for musicians moving pieces between instruments or vocal ranges.</div>
           <a href="./Projects/MTranspose.html" class="proj-link">Launch Demo →</a>
         </div>
-        <!-- placeholder cards to suggest adding more -->
+        <!-- placeholder cards I will add more later -->
         <div class="proj-card" style="opacity:.35; pointer-events:none; border-style:dashed;">
           <div class="proj-icon" style="color:var(--dim);">+</div>
           <div class="proj-title" style="color:var(--dim);">More coming soon</div>
@@ -859,7 +859,7 @@
       </div>
     </section>
 
-    <!-- ── EXPERIENCE ── -->
+    <!-- EXPERIENCE -->
     <section class="section" id="experience">
       <div class="sec-header">
         <span class="sec-tag">05</span>
@@ -897,7 +897,7 @@
       </div>
     </section>
 
-    <!-- ── INTERACTIVE TERMINAL ── -->
+    <!--  INTERACTIVE TERMINAL  -->
     <section class="terminal-section" id="terminal">
       <div class="sec-header">
         <span class="sec-tag">06</span>
@@ -933,7 +933,7 @@
   </div><!-- /page -->
 
   <script>
-  // ── Cursor ──────────────────────────────────────────────
+  // -- Cursor -------------------------------------------------------------->
   const cursor = document.getElementById('cursor');
   const trail  = document.getElementById('cursor-trail');
   document.addEventListener('mousemove', e => {
@@ -945,7 +945,7 @@
   document.addEventListener('mousedown', () => cursor.classList.add('clicking'));
   document.addEventListener('mouseup',   () => cursor.classList.remove('clicking'));
 
-  // ── Clock ───────────────────────────────────────────────
+  // -- Clock ----------------------------------------------------->
   function tick() {
     const s = new Date().toUTCString().slice(17, 25);
     document.getElementById('clock').textContent = `UTC: ${s}`;
@@ -954,7 +954,7 @@
   tick();
   setInterval(tick, 1000);
 
-  // ── Starfield ────────────────────────────────────────────
+  // -- Starfield ---------------------------------------------------->
   const canvas = document.getElementById('starCanvas');
   const ctx    = canvas.getContext('2d');
   let W, H, stars = [];
@@ -1051,13 +1051,13 @@
   cancelAnimationFrame(drawStars);
   drawAll();
 
-  // ── Scroll reveal ─────────────────────────────────────────
+  // -- Scroll reveal ---------------------------------------->
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
   }, { threshold: 0.1 });
   document.querySelectorAll('.section, .terminal-section').forEach(el => obs.observe(el));
 
-  // ── Interactive Terminal ───────────────────────────────────
+  // -- Interactive Terminal --------------------------------------------->
   const termBody  = document.getElementById('termBody');
   const termInput = document.getElementById('termInput');
   const history   = [];
