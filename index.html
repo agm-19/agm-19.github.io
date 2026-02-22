@@ -192,7 +192,7 @@
       60%  { clip-path: polygon(0 65%, 100% 65%, 100% 75%, 0 75%); transform: translateX(3px); }
       61%  { clip-path: none; transform: none; }
     }
-    .hero-name:hover { animation: glitch .35s steps(1) forwards; }
+    .hero-name:hover { animation: glitch .35s steps(1); }
 
     /* links row */
     .hero-links {
@@ -1008,7 +1008,7 @@
     if (Math.random() < 0.003) shootingStar();
     requestAnimationFrame(drawStars);
   }
-  drawStars();
+  //drawStars();
 
   let shooters = [];
   function shootingStar() {
@@ -1048,8 +1048,10 @@
     requestAnimationFrame(drawAll);
   }
   // replace the first draw call
-  cancelAnimationFrame(drawStars);
+  //cancelAnimationFrame(drawStars);
   drawAll();
+let rafId = requestAnimationFrame(drawAll); // storing the ID for cancel
+// Remove the first drawStars() call and just use drawAll()
 
   // -- Scroll reveal ---------------------------------------->
   const obs = new IntersectionObserver(entries => {
@@ -1180,8 +1182,11 @@
     const title  = latest.title.$t;
     const link   = latest.link.find(l => l.rel === 'alternate').href;
     document.getElementById('latest-post').innerHTML =
-      `Latest: <a href="${link}" target="_blank" style="color:var(--o);border-bottom:1px dotted var(--o);">${title}</a>`;
-  });
+      `Latest: <a href="${link}" target="_blank" style="color:var(--o);border-bottom:1px dotted var(--o);">${title}</a>`; 
+  }
+       .catch(() => {
+  document.getElementById('latest-post').textContent = '';
+       });
  
   </script>
 </body>
