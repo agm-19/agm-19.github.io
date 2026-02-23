@@ -203,6 +203,14 @@
 
     
     /* .hero-name:hover { animation: glitch .35s steps(1); } */
+    
+.hero-name {
+  transition: text-shadow .3s, letter-spacing .3s;
+}
+.hero-name:hover {
+  text-shadow: 0 0 12px rgba(0,255,65,1), 0 0 40px rgba(0,255,65,.6), 0 0 80px rgba(0,255,65,.3);
+  letter-spacing: .02em;
+}
 
     /* links row */
     .hero-links {
