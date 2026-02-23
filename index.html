@@ -1047,11 +1047,11 @@
     }
     requestAnimationFrame(drawAll);
   }
-  // replace the first draw call
+
   //cancelAnimationFrame(drawStars);
   drawAll();
-let rafId = requestAnimationFrame(drawAll); // storing the ID for cancel
-// Remove the first drawStars() call and just use drawAll()
+//let rafId = requestAnimationFrame(drawAll); // storing the ID for cancel
+
 
   // -- Scroll reveal ---------------------------------------->
   const obs = new IntersectionObserver(entries => {
@@ -1183,7 +1183,7 @@ let rafId = requestAnimationFrame(drawAll); // storing the ID for cancel
     const link   = latest.link.find(l => l.rel === 'alternate').href;
     document.getElementById('latest-post').innerHTML =
       `Latest: <a href="${link}" target="_blank" style="color:var(--o);border-bottom:1px dotted var(--o);">${title}</a>`; 
-  }
+  })
        .catch(() => {
   document.getElementById('latest-post').textContent = '';
        });
