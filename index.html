@@ -1193,18 +1193,38 @@
   setTimeout(autoType, 1200);
 
 
-    fetch('https://sciphisix.blogspot.com/feeds/posts/default?alt=json')
-  .then(r => r.json())
-  .then(data => {
+ //   fetch('https://sciphisix.blogspot.com/feeds/posts/default?alt=json')
+ // .then(r => r.json())
+ // .then(data => {
+ //   const latest = data.feed.entry[0];
+ //   const title  = latest.title.$t;
+ //   const link   = latest.link.find(l => l.rel === 'alternate').href;
+ //   document.getElementById('latest-post').innerHTML =
+ //     `Latest: <a href="${link}" target="_blank" style="color:var(--o);border-bottom:1px dotted var(--o);">${title}</a>`; 
+ // })
+ //      .catch(() => {
+ // document.getElementById('latest-post').textContent = '';
+ //      });
+
+window.blogCallback = function(data) {
+  try {
     const latest = data.feed.entry[0];
     const title  = latest.title.$t;
     const link   = latest.link.find(l => l.rel === 'alternate').href;
     document.getElementById('latest-post').innerHTML =
-      `Latest: <a href="${link}" target="_blank" style="color:var(--o);border-bottom:1px dotted var(--o);">${title}</a>`; 
-  })
-       .catch(() => {
-  document.getElementById('latest-post').textContent = '';
-       });
+      `Latest: <a href="${link}" target="_blank" style="color:var(--o);border-bottom:1px dotted var(--o);">${title}</a>`;
+  } catch(e) {
+    document.getElementById('latest-post').textContent = '';
+  }
+};
+
+const script = document.createElement('script');
+script.src = 'https://sciphisix.blogspot.com/feeds/posts/default?alt=json&max-results=1&callback=blogCallback';
+script.onerror = () => document.getElementById('latest-post').textContent = '';
+document.head.appendChild(script);
+
+
+    
 
 document.querySelector('.hero-name').addEventListener('animationend', function() {
   this.style.opacity = '1';
