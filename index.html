@@ -1197,7 +1197,14 @@
        .catch(() => {
   document.getElementById('latest-post').textContent = '';
        });
- 
+
+document.querySelector('.hero-name').addEventListener('animationend', function() {
+  this.style.opacity = '1';
+  this.style.animation = 'none';
+});
+
+
+    
   </script>
 </body>
 </html>
