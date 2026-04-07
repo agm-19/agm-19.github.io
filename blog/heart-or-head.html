@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whom should we listen to? Heart or head · Aravind Muraleedharan</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --white:#ffffff; --off-white:#f9f8f6; --light:#f2f0ec; --border:#e2dfd9; --muted:#9a9590; --body:#3a3733; --heading:#1a1815; --accent:#8b3a2a; --accent-light:#f5ede9; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'DM Sans', sans-serif; background: var(--white); color: var(--body); font-size: 16px; line-height: 1.75; }
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(255,255,255,0.93); backdrop-filter: blur(12px); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 48px; height: 60px; }
+    .nav-name { font-family: 'EB Garamond', serif; font-size: 18px; font-weight: 500; color: var(--heading); letter-spacing: 0.01em; text-decoration: none; }
+    .nav-links { display: flex; gap: 34px; list-style: none; }
+    .nav-links a { font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); text-decoration: none; transition: color 0.2s; }
+    .nav-links a:hover, .nav-links a.active { color: var(--heading); }
+    .post-wrap { max-width: 720px; margin: 0 auto; padding: 120px 48px 100px; }
+    .back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--muted); text-decoration: none; letter-spacing: 0.04em; margin-bottom: 48px; transition: color 0.2s; }
+    .back-link:hover { color: var(--heading); }
+    .post-cat { display: inline-block; padding: 3px 10px; font-size: 11px; font-weight: 500; letter-spacing: 0.06em; border-radius: 2px; text-transform: uppercase; background: var(--accent-light); color: var(--accent); margin-bottom: 16px; }
+    .post-title { font-family: 'EB Garamond', serif; font-size: clamp(32px, 5vw, 46px); font-weight: 500; color: var(--heading); line-height: 1.15; margin-bottom: 16px; }
+    .post-date { font-size: 13px; color: var(--muted); letter-spacing: 0.04em; margin-bottom: 48px; display: block; }
+    .post-divider { width: 48px; height: 2px; background: var(--accent); margin-bottom: 48px; }
+    .post-body p { margin-bottom: 22px; }
+    .post-body p:last-child { margin-bottom: 0; }
+    .post-body blockquote { border-left: 2px solid var(--accent); padding: 4px 20px; margin: 28px 0; font-family: 'EB Garamond', serif; font-style: italic; font-size: 20px; color: var(--heading); line-height: 1.5; }
+    .post-body strong { color: var(--heading); font-weight: 500; }
+    .post-nav { margin-top: 64px; padding-top: 32px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; gap: 20px; }
+    .post-nav a { font-size: 13px; color: var(--accent); text-decoration: none; letter-spacing: 0.04em; }
+    .post-nav a:hover { text-decoration: underline; }
+    .footer-rule { border-top: 1px solid var(--border); margin-top: 60px; }
+    footer { padding: 26px 48px; display: flex; align-items: center; justify-content: space-between; max-width: 1100px; margin: 0 auto; }
+    .footer-name { font-family: 'EB Garamond', serif; font-size: 15px; color: var(--muted); }
+    .footer-copy { font-size: 12px; color: var(--muted); letter-spacing: 0.04em; }
+    @media (max-width: 720px) { nav { padding: 0 20px; } .nav-links { gap: 16px; } .nav-links a { font-size: 11px; } .post-wrap { padding: 100px 24px 80px; } footer { padding: 22px; flex-direction: column; gap: 8px; text-align: center; } }
+  </style>
+</head>
+<body>
+  <nav>
+    <a href="../index.html" class="nav-name">Aravind Muraleedharan</a>
+    <ul class="nav-links">
+      <li><a href="../index.html#about">About</a></li>
+      <li><a href="../index.html#publications">Publications</a></li>
+      <li><a href="../index.html#projects">Research</a></li>
+      <li><a href="../index.html#cv">CV</a></li>
+      <li><a href="index.html" class="active">Brain Dump</a></li>
+      <li><a href="../index.html#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <div class="post-wrap">
+    <a href="index.html" class="back-link">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"/></svg>
+      All posts
+    </a>
+    <span class="post-cat">Perspectives</span>
+    <h1 class="post-title">Whom should we listen to? Heart or head</h1>
+    <span class="post-date">August 9, 2025</span>
+    <div class="post-divider"></div>
+    <div class="post-body">
+      <p>This is a common question we all come across: there is often a deep clash between the thoughts from the head and the feelings from the heart. One is guided by emotion, the other by logic. Which one should we go by?</p>
+      <p>Personally, I prefer using logic as the foundation, and then adding emotion on top of it. This might be because of my engineering background, and how I was trained to think strategically and logically rather than letting emotions bias decisions. Still, I respect and value both inputs.</p>
+      <p>The reason is that heart-based decisions often feel vague, carry a lot of uncertainty, and can change at any time. Head-based decisions, on the other hand, are less prone to change because they are usually built on facts and stable principles. This stability is essential for a strong foundation.</p>
+      <p>We can think of it like constructing a building: the head provides the solid foundation that should not change much over time, while the heart can shape the flexible and changing structure above it. A building needs both to stand strong and also adapt when needed.</p>
+    </div>
+    <div class="post-nav">
+      <a href="life-so-far.html">← Life so far</a>
+      <a href="index.html">All posts</a>
+    </div>
+  </div>
+
+  <div class="footer-rule">
+    <footer>
+      <span class="footer-name">Aravind Muraleedharan</span>
+      <span class="footer-copy">© 2026 · Purdue University ECE</span>
+    </footer>
+  </div>
+</body>
+</html>
